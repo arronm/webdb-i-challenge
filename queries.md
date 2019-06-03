@@ -7,46 +7,50 @@ SELECT * FROM Customers WHERE `city` = 'London'
 SELECT * FROM Customers WHERE `postalcode` = '1010'
 
 ## find the phone number for the supplier with the id 11. Should be (010) 9984510.
-SELECT * FROM Suppliers WHERE `supplierid` = 11
+SELECT * FROM `suppliers`
+WHERE `supplierid` = 11;
 
 ## list orders descending by the order date. The order with date 1997-02-12 should be at the top.
-SELECT * FROM Orders ORDER BY `orderdate` DESC
+SELECT * FROM `orders`
+ORDER BY `orderdate` DESC;
 
 ## find all suppliers who have names longer than 20 characters. You can use `length(SupplierName)` to get the length of the name. Returns 11 records.
-SELECT * FROM Suppliers WHERE length(`suppliername`) > 20
+SELECT * FROM `suppliers`
+WHERE length(`suppliername`) > 20;
 
 ## find all customers that include the word "market" in the name. Should return 4 records.
-SELECT * FROM Customers WHERE `customername` LIKE '%market%'
+SELECT * FROM `customers`
+WHERE `customername` LIKE '%market%';
 
 ## add a customer record for _"The Shire"_, the contact name is _"Bilbo Baggins"_ the address is _"1 Hobbit-Hole"_ in _"Bag End"_, postal code _"111"_ and the country is _"Middle Earth"_.
-INSERT INTO Customers (CustomerName, ContactName, Address, City, PostalCode, Country)
+INSERT INTO `customers` (CustomerName, ContactName, Address, City, PostalCode, Country)
 VALUES ('The Shire', 'Bilbo Baggins', '1 Hobbit-Hole', 'Bag End', '111', 'Middle Earth')
 
 ## update _Bilbo Baggins_ record so that the postal code changes to _"11122"_.
-UPDATE Customers
+UPDATE `customers`
 SET `postalcode` = '11122'
 WHERE `customername` = 'Bilbo Baggins'
 
 ## list orders grouped by customer showing the number of orders per customer. _Rattlesnake Canyon Grocery_ should have 7 orders.
-SELECT DISTINCT Customers.CustomerName, COUNT(Orders.OrderID) FROM Customers
-LEFT OUTER JOIN Orders ON Customers.CustomerID=Orders.CustomerID
-GROUP BY Customers.CustomerName;
+SELECT DISTINCT customers.customername, COUNT(orders.orderid) FROM `customers`
+LEFT OUTER JOIN `orders` ON customers.customerid = orders.customerid
+GROUP BY customers.customername
 
 ## list customers names and the number of orders per customer. Sort the list by number of orders in descending order. _Ernst Handel_ should be at the top with 10 orders followed by _QUICK-Stop_, _Rattlesnake Canyon Grocery_ and _Wartian Herkku_ with 7 orders each.
-SELECT Customers.CustomerName, COUNT(Orders.OrderID) FROM Customers
-LEFT JOIN Orders ON Customers.CustomerID=Orders.CustomerID
-GROUP BY Customers.CustomerName
-ORDER BY COUNT(Orders.OrderID) DESC;
+SELECT DISTINCT customers.customername, COUNT(orders.orderid) as total_orders FROM `customers`
+LEFT OUTER JOIN `orders` ON customers.customerid = orders.customerid
+GROUP BY customers.customername
+ORDER BY total_orders DESC;
 
 ## list orders grouped by customer's city showing number of orders per city. Returns 58 Records with _Aachen_ showing 2 orders and _Albuquerque_ showing 7 orders.
-SELECT DISTINCT Customers.City, COUNT(Orders.OrderID) FROM Customers
-LEFT JOIN Orders ON Customers.CustomerID=Orders.CustomerID
-GROUP BY Customers.City
-ORDER BY COUNT(Orders.OrderID) DESC;
+SELECT DISTINCT customers.city, COUNT(orders.orderid) as total_orders FROM `customers`
+LEFT JOIN `orders` ON customers.customerid = orders.customerid
+GROUP BY customers.city
+ORDER BY total_orders DESC;
 
 ## delete all users that have no orders. Should delete 17 (or 18 if you haven't deleted the record added) records.
-DELETE FROM Customers
-WHERE CustomerID IN
-(SELECT Customers.CustomerID FROM Customers
-LEFT OUTER JOIN Orders ON Orders.CustomerID = Customers.CustomerID
-WHERE Orders.OrderID IS NULL);
+DELETE FROM `customers`
+WHERE `customerid` IN
+(SELECT customers.customerid FROM `customers`
+LEFT JOIN `orders` ON orders.customerid = customers.customerid
+WHERE orders.orderid IS NULL);
