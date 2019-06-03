@@ -12,14 +12,18 @@ const errorRef = (error) => {
 };
 
 const validateID = async (req, res, next) => {
-  const account = await db.findById(req.params.id);
-  if (!account) {
-    return res.status(400).json({
-      message: `Account ID (${req.params.id}) does not exist`,
-    });
+  try {
+    const account = await db.findById(req.params.id);
+    if (!account) {
+      return res.status(400).json({
+        message: `Account ID (${req.params.id}) does not exist`,
+      });
+    }
+    req.account = account;
+    next();
+  } catch (error) {
+    res.status(500).json(errorRef(error));
   }
-  req.account = account;
-  next();
 };
 
 const validateAccount = (req, res, next) => {
@@ -36,8 +40,12 @@ const validateAccount = (req, res, next) => {
 
 // GET
 server.get('/api/accounts', async (req, res) => {
-  const accounts = await db.find();
-  res.json(accounts);
+  try {
+    const accounts = await db.find();
+    res.json(accounts);
+  } catch (error) {
+    res.status(500).json(errorRef(error));
+  }
 });
 
 server.get('/api/accounts/:id', validateID, (req, res) => {
@@ -75,8 +83,12 @@ server.put('/api/accounts/:id', validateID, async (req, res) => {
 
 // DELETE
 server.delete('/api/accounts/:id', validateID, async (req, res) => {
-  await db.remove(req.account.id);
-  res.json(req.account);
+  try {
+    await db.remove(req.account.id);
+    res.json(req.account);
+  } catch (error) {
+    res.status(500).json(errorRef(error));
+  }
 });
 
 module.exports = server;
