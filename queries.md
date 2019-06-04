@@ -44,7 +44,7 @@ ORDER BY total_orders DESC;
 
 ## list orders grouped by customer's city showing number of orders per city. Returns 58 Records with _Aachen_ showing 2 orders and _Albuquerque_ showing 7 orders.
 SELECT DISTINCT customers.city, COUNT(orders.orderid) as total_orders FROM `customers`
-LEFT JOIN `orders` ON customers.customerid = orders.customerid
+INNER JOIN `orders` ON customers.customerid = orders.customerid
 GROUP BY customers.city
 ORDER BY total_orders DESC;
 
